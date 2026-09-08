@@ -29,4 +29,6 @@ create policy demo_submissions_read_approved
 
 -- SELECT and nothing else. Rows only ever arrive from n8n using the service
 -- role, after moderation. Nothing can write to this table from a browser.
-grant select on public.demo_submissions to anon;
+revoke all on public.demo_submissions from anon;
+grant select (id, created_at, message, status, answer, answered_at)
+  on public.demo_submissions to anon;

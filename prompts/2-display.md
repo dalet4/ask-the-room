@@ -26,10 +26,14 @@ not the form.
 Build a single-page web app that displays audience submissions on a projector.
 
 Data source — Supabase, read-only with the publishable key:
-  URL:  https://YOUR-PROJECT.supabase.co
-  key:  sb_publishable_YOUR_KEY
+  URL:  https://ivnmtkdxduxjgztjlfzs.supabase.co
+  key:  sb_publishable_OAyBkfyfj18XWhD4LWoRkg_bILEyBxm
   table: public.demo_submissions
-  columns: id, created_at, message, email, status, block_reason, answer, answered_at
+  columns: id, created_at, message, status, answer, answered_at
+
+Request exactly those columns, never select=*. Email and moderation reasons
+are private and the public key cannot read them. Render messages and answers
+as plain text using textContent, never innerHTML.
 
 That key can only ever read rows that have already been approved, so you do not
 need to filter on status yourself. Order by created_at descending. Poll every 3
@@ -45,14 +49,18 @@ It is going on a projector at the front of a room about fifteen metres deep:
 - No horizontal scrolling, no hover states, nothing that needs a mouse.
 - New cards animate in gently. Nothing flashes, nothing bounces.
 
+Save to display/index.html. Keep the prepared
+fallback at the demo-safe tag's display/index.html
+unchanged. The public form is https://ask-the-room-omega.vercel.app.
+Include a link labelled "Get the workflow" to https://github.com/dalet4/ask-the-room.
+
 One file, plain HTML with inline CSS and JavaScript. No build step, no framework,
 no dependencies beyond a fetch to Supabase.
 
 Do not build a submission form. One already exists and is live.
+Deploy the display directory to Vercel as its own project, never over the form.
+Return its public URL and check it loads without signing in.
 ```
-
-> The prompt actually sent on the night had the real project URL and key in
-> those two lines. Put your own in.
 
 ---
 
