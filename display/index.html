@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>The room's questions</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#15171c;color:#f7f7fa;font-family:Arial,Helvetica,sans-serif}main{min-height:100vh;padding:5vh 6vw;display:flex;flex-direction:column}header,footer{display:flex;justify-content:space-between;gap:24px;align-items:center}header{font-size:clamp(22px,2.2vw,36px);color:#ff8dab}a{color:inherit}article{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1500px;margin:auto 0;padding:4vh 0}h1{font-size:clamp(30px,3.1vw,54px);line-height:1.18;white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 28px}#answer{font-size:clamp(28px,2.5vw,42px);line-height:1.3;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;color:#d3d7df}footer{font-size:clamp(18px,1.5vw,26px);color:#d3d7df}button{font:inherit;color:inherit;background:transparent;border:1px solid #777;padding:8px 16px;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #ff8dab;outline-offset:5px}#warning{color:#ffbf99}#fallback{font-size:20px;color:#c7cbd2}#blank{position:fixed;inset:0;background:#15171c;z-index:5}#blank[hidden]{display:none}@media(max-width:700px){header,footer{flex-wrap:wrap}main{padding:24px}h1{font-size:30px}#answer{font-size:28px}}
+</style>
+<main>
+<header><span id="title">The room's questions</span><a href="https://ask-the-room-omega.vercel.app">ask-the-room-omega.vercel.app</a></header>
+<p id="fallback" hidden>Prepared fallback</p>
+<article><h1 id="message">Your question goes here</h1><p id="answer">Scan the code on the arrival slide and send a question or an idea.</p></article>
+<footer><span id="state" role="status">Connecting…</span><span id="warning" role="status"></span><span><button id="previous" aria-label="Previous question">←</button> <button id="pause">Pause</button> <button id="next" aria-label="Next question">→</button></span><a href="https://github.com/dalet4/ask-the-room">Get the workflow</a></footer>
+</main><div id="blank" hidden></div>
+<script>
+const params=new URLSearchParams(location.search),intake=params.has('intake');
+document.querySelector('#fallback').hidden=!params.has('fallback');
+document.querySelector('#title').textContent=intake?'Your questions and ideas':"The room's own agent";
+const url='https://ivnmtkdxduxjgztjlfzs.supabase.co/rest/v1/demo_submissions?select=id,created_at,message,status,answer,answered_at&status=eq.approved&order=created_at.desc&limit=6';
+const key='sb_publishable_OAyBkfyfj18XWhD4LWoRkg_bILEyBxm';
+let rows=[],index=0,paused=false;
+function show(){
+ const row=rows[index];
+ document.querySelector('#message').textContent=row?row.message:'Your question goes here';
+ document.querySelector('#answer').textContent=row?(intake?'':row.answer||'Waiting for an answer…'):'Scan the code on the arrival slide and send a question or an idea.';
+ document.querySelector('#state').textContent=rows.length?`${index+1} of ${rows.length} recent questions`:'Ready for your first question';
+}
+async function refresh(){
+ try{
+  const res=await fetch(url,{headers:{apikey:key},signal:AbortSignal.timeout(7000)});
+  if(!res.ok)throw Error('read failed');
+  const data=await res.json();
+  if(!Array.isArray(data))throw Error('invalid response');
+  const previousId=rows[index]?.id;
+  rows=data.filter(r=>r.status==='approved'&&typeof r.message==='string');
+  index=Math.max(0,rows.findIndex(r=>r.id===previousId));
+  document.querySelector('#warning').textContent='';show();
+ }catch{
+  // ponytail: hide stale content on a lost connection so the kill switch stays honest.
+  rows=[];index=0;show();document.querySelector('#warning').textContent='Connection paused. Reconnecting…';
+ }finally{setTimeout(refresh,3000)}
+}
+function move(step){if(rows.length){index=(index+step+rows.length)%rows.length;show()}}
+function togglePause(){paused=!paused;document.querySelector('#pause').textContent=paused?'Resume':'Pause'}
+document.querySelector('#previous').onclick=()=>move(-1);document.querySelector('#next').onclick=()=>move(1);document.querySelector('#pause').onclick=togglePause;
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')move(1);if(e.key==='ArrowLeft')move(-1);if(e.key===' '){e.preventDefault();togglePause()}if(e.key.toLowerCase()==='b')document.querySelector('#blank').hidden=!document.querySelector('#blank').hidden;if(e.key.toLowerCase()==='f')document.documentElement.requestFullscreen?.().catch(()=>{})});
+setInterval(()=>{if(!paused)move(1)},12000);refresh();
+</script>
+</html>
