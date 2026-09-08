@@ -1,0 +1,118 @@
+{
+  "name": "Leeds \u2014 Send Itself To The Room",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Dale hits this on stage",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "read",
+      "name": "Everyone who left an email",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "getAll",
+        "tableId": "demo_submissions",
+        "returnAll": true,
+        "filterType": "string",
+        "filterString": "email=not.is.null"
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "toVXgPQRDLFIwR9Z",
+          "name": "Aigentic Supabase (service role)"
+        }
+      }
+    },
+    {
+      "id": "dedupe",
+      "name": "One email each",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Someone who submitted four times gets one email, not four.\nconst seen = new Set();\nconst out = [];\nfor (const item of $input.all()) {\n  const email = String(item.json.email ?? '').trim().toLowerCase();\n  if (!email || seen.has(email)) continue;\n  seen.add(email);\n  out.push({ json: { email } });\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "send",
+      "name": "Send it",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "The workflow you just watched get built",
+        "emailType": "text",
+        "message": "Hello,\n\nYou scanned a QR code at the n8n Leeds meetup and typed something into a box. This is that workflow, sending itself to you, which is the last thing it does.\n\nEverything from tonight is here:\nhttps://github.com/dalet4/ask-the-room\n\nThe README starts with how to import it into n8n. You do not need to have understood any of the code to get it running.\n\nYour email address was used for this and nothing else. It is not on a list.\n\nSpeak soon,\nDale\n\nDale Taylor\nAigentic\nhttps://aigentic-ai.co.uk",
+        "options": {}
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "KQOZZlgL2q95tXRm",
+          "name": "Gmail account"
+        }
+      },
+      "webhookId": "02697522-264c-4bbc-b26a-b4e541ec49be"
+    }
+  ],
+  "connections": {
+    "Dale hits this on stage": {
+      "main": [
+        [
+          {
+            "node": "Everyone who left an email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Everyone who left an email": {
+      "main": [
+        [
+          {
+            "node": "One email each",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One email each": {
+      "main": [
+        [
+          {
+            "node": "Send it",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Europe/London",
+    "executionOrder": "v1"
+  }
+}
