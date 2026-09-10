@@ -64,7 +64,7 @@
         "sendTo": "={{ $json.email }}",
         "subject": "The workflow you just watched get built",
         "emailType": "text",
-        "message": "Hello,\n\nYou scanned a QR code at the n8n Leeds meetup and typed something into a box. This is that workflow, sending itself to you, which is the last thing it does.\n\nEverything from tonight is here:\nhttps://github.com/dalet4/ask-the-room\n\nThe README starts with how to import it into n8n. You do not need to have understood any of the code to get it running.\n\nYour email address was used for this and nothing else. It is not on a list.\n\nSpeak soon,\nDale\n\nDale Taylor\nAigentic\nhttps://aigentic-ai.co.uk",
+        "message": "Hello,\n\nYou scanned a QR code at the n8n Leeds meetup and typed something into a box. This is that workflow, sending itself to you, which is the last thing it does.\n\nEverything from today is here:\nhttps://github.com/dalet4/ask-the-room\n\nThe README starts with how to import it into n8n. You do not need to have understood any of the code to get it running.\n\nYour email address was used for this and nothing else. It is not on a list.\n\nSpeak soon,\nDale\n\nDale Taylor\nAigentic\nhttps://aigentic-ai.co.uk",
         "options": {}
       },
       "credentials": {
