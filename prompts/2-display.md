@@ -49,6 +49,16 @@ It is going on a projector at the front of a room about fifteen metres deep:
 - No horizontal scrolling, no hover states, nothing that needs a mouse.
 - New cards animate in gently. Nothing flashes, nothing bounces.
 
+Brand it as Aigentic:
+- Background #0b0f20. Body text #f8f7ff. Message text pure white #ffffff.
+- Accent #00D4FF for links, labels and focus. Purple #9D4EDD only ever in a
+  gradient with the cyan, never on its own. No pink, no orange, no text shadows.
+- Montserrat 600 to 700 for the message text, Roboto for everything else,
+  from Google Fonts, with Arial as the fallback.
+- The logo is already at display/aigentic-logo.svg. Put it top left, 48px,
+  next to the word AIGENTIC in Montserrat 700, uppercase, 0.08em letter
+  spacing. Do not recolour or redraw it.
+
 Save to display/index.html. Keep the prepared
 fallback at the demo-safe tag's display/index.html
 unchanged. The public form is https://ask-the-room-omega.vercel.app.
